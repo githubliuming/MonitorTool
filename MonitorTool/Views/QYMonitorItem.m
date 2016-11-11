@@ -47,7 +47,20 @@
     }
 }
 - (void)setTitleString:(NSString*)titleString { self.titleLabel.text = titleString; }
-- (void)setDataString:(NSString*)dataString { self.dataLabel.text = dataString; }
+- (void)setDataString:(NSString*)dataString
+{
+    if (dataString.length == 0)
+    {
+        self.titleLabel.frame = self.bounds;
+    }
+    else
+    {
+        self.titleLabel.frame = CGRectMake(0, 0, self.width, self.height * scaleHeightOfTitle);
+        self.dataLabel.frame =
+            CGRectMake(0, self.height * scaleHeightOfTitle, self.width, self.height * (1 - scaleHeightOfTitle));
+    }
+    self.dataLabel.text = dataString;
+}
 /*
 // Only override drawRect: if you perform custom drawing.
 // An empty implementation adversely affects performance during animation.

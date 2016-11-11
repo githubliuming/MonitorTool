@@ -32,13 +32,17 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
 
-    UITableView* table = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, 320, 560) style:UITableViewStylePlain];
+    UITableView* table = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
     table.delegate = self;
     table.dataSource = self;
     [table registerClass:[UITableViewCell class] forCellReuseIdentifier:@"123"];
     [self.view addSubview:table];
 
-    QYMonitorView* view = [[QYMonitorView alloc] init];
+    QYMonitorView* view = [[QYMonitorView alloc] initWithCustomArr:@[newModel(@"https://www.baidu.com", @"百度", NO, QYMonitorCategoryOfCustom),
+                                                                     newModel(@"https://www.baidu.com", @"百度", NO, QYMonitorCategoryOfCustom),
+                                                                     newModel(@"https://www.baidu.com", @"百度", NO, QYMonitorCategoryOfCustom),
+                                                                     newModel(@"https://www.baidu.com", @"百度", NO, QYMonitorCategoryOfCustom),
+                                                                     newModel(@"https://www.baidu.com", @"百度", NO, QYMonitorCategoryOfCustom)]];
     [view showToWindow];
 }
 - (NSInteger)numberOfSectionsInTableView:(UITableView*)tableView { return 1; }

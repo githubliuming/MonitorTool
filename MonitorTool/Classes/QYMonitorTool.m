@@ -11,16 +11,29 @@
 #import <mach/mach.h>
 #import <sys/sysctl.h>
 @interface QYMonitorTool ()
-@property(nonatomic, strong) CADisplayLink* link;
+@property(nonatomic, strong) CADisplayLink *link;
 @property(nonatomic, assign) NSUInteger count;
 @property(nonatomic, assign) NSTimeInterval lastTime;
 @property(nonatomic, assign) NSInteger fpsCount;
 @end
 @implementation QYMonitorTool
 
+- (NSArray *)getMonitors
+{
+    return @[
+        newModel(@"", @"FPS", NO, QYMonitorCategoryOfFPS),
+        newModel(@"", @"CPU", NO, QYMonitorCategoryOfCPU),
+        newModel(@"", @"Memory", NO, QYMonitorCategoryOfMemory),
+        newModel([self currentSysLanguage], @"Language", NO, QYMonitorCategoryOfLanguage),
+        newModel([self currenCountryDec], @"Country", NO, QYMonitorCategoryOfCountry),
+        newModel(@"", @"More", YES, QYMonitorCategoryOfCustom),
+        newModel(@"", @"Email", YES, QYMonitorCategoryOfSendEmail),
+    ];
+}
+
 - (instancetype)shareInstaced
 {
-    static QYMonitorTool* toolObj = nil;
+    static QYMonitorTool *toolObj = nil;
 
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -39,7 +52,7 @@
     [_link addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
 }
 
-- (void)tick:(CADisplayLink*)link
+- (void)tick:(CADisplayLink *)link
 {
     if (_lastTime == 0)
     {
@@ -54,19 +67,22 @@
     float fps = _count / delta;
     _count = 0;
 
-    [self sendDelegate:QYMonitorCategoryOfFPS andData:fps];
+    NSString *fps_ = [NSString stringWithFormat:@"%.2f", fps];
+    [self sendDelegate:QYMonitorCategoryOfFPS andData:fps_];
 
     if (self.fpsCount % 2 == 0)
     {
-        [self sendDelegate:QYMonitorCategoryOfCPU andData:cpu_usage()];
+        NSString *cpu = [NSString stringWithFormat:@"%.1f%%", cpu_usage()];
+        [self sendDelegate:QYMonitorCategoryOfCPU andData:cpu];
         double totolMemory = [self getTotalMemorySize];
         double canUserMemory = [self usedMemory];
-        [self sendDelegate:QYMonitorCategoryOfMemory andData:(canUserMemory / totolMemory) * 100];
+        NSString *data = [NSString stringWithFormat:@"%.1f%%", (canUserMemory / totolMemory) * 100];
+        [self sendDelegate:QYMonitorCategoryOfMemory andData:data];
     }
     self.fpsCount = (++self.fpsCount) % 10001;
 }
 
-- (void)sendDelegate:(QYMonitorCategory)category andData:(double)data
+- (void)sendDelegate:(QYMonitorCategory)category andData:(NSString *)data
 {
     if (self.delegate && [self.delegate respondsToSelector:@selector(monitor:category:data:)])
     {
@@ -173,4 +189,13 @@ float cpu_usage()
     [self.link invalidate];
     self.link = nil;
 }
+
+- (NSString *)currentSysLanguage { return [[NSLocale preferredLanguages] objectAtIndex:0]; }
+- (NSString *)currentSysVersion { return [[UIDevice currentDevice] systemVersion]; }
+- (NSString *)currenCountryCode { return [[NSLocale currentLocale] objectForKey:NSLocaleCountryCode]; }
+- (NSString *)currenCountryDec
+{
+    return [[NSLocale currentLocale] displayNameForKey:NSLocaleCountryCode value:[self currenCountryCode]];
+}
 @end
+

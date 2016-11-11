@@ -7,18 +7,18 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "ItemModel.h"
 
-typedef NS_ENUM(NSInteger, QYMonitorCategory) {
-    QYMonitorCategoryOfFPS,
-    QYMonitorCategoryOfCPU,
-    QYMonitorCategoryOfMemory,
-    QYMonitorCategoryOfSendEmail
-};
+
+
+#define itemTitle @"title"
+#define itemCategory @"itemCategory"
+#define itemCanClicked @"itemCanClicked"
 
 @class QYMonitorTool;
 @protocol QYMonitorToolDelegate<NSObject>
 
-- (void)monitor:(QYMonitorTool *)monitor category:(QYMonitorCategory)category data:(double)data;
+- (void)monitor:(QYMonitorTool *)monitor category:(QYMonitorCategory)category data:(NSString *)data;
 
 @end
 
@@ -26,6 +26,9 @@ typedef NS_ENUM(NSInteger, QYMonitorCategory) {
 //- (instancetype)shareInstaced;
 
 @property(nonatomic, assign) id<QYMonitorToolDelegate> delegate;
+
+- (NSArray*)getMonitors;
+
 - (void)startMonitor;
 
 - (void)freeTimer;
